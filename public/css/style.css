@@ -1526,7 +1526,8 @@ span.shoppy-rate h4 {
     background: #FDBB30;
 }
 .popular-follow {
-    margin-top:2.35em;
+    margin-top: 0em;
+    margin-bottom: 2em;
     background: #fff;
     box-shadow: 0px 0px 2px 1px rgba(0,0,0,0.15);
 }
@@ -1536,9 +1537,18 @@ span.shoppy-rate h4 {
 }
 .popular-follo-left {
     background:#68AE00;
-    padding: 2.5em 1em;
+    padding: 2.8em 1em;
+}
+.popular-follo-left-alt {
+    background:#FC8213;
+    padding: 2.8em 1em;
 }
 .popular-follo-left p {
+    font-size: 1em;
+    color: #fff;
+    line-height: 1.8em;
+}
+.popular-follo-left-alt p {
     font-size: 1em;
     color: #fff;
     line-height: 1.8em;
