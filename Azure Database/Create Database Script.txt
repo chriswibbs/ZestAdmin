@@ -1,0 +1,170 @@
+-- MySQL Workbench Synchronization
+-- Generated: 2018-03-29 06:59
+-- Model: New Model
+-- Version: 1.0
+-- Project: Name of the project
+-- Author: ChrisWibberley
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL,ALLOW_INVALID_DATES';
+
+CREATE SCHEMA IF NOT EXISTS `wifi-1` DEFAULT CHARACTER SET utf8 ;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`partners` (
+  `partners_AccountCode` VARCHAR(6) NOT NULL,
+  `partners_AccountName` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_Address1` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_Address2` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_City` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_County` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_Postcode` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_CompanyReg` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_AccountManager` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_Logo` VARCHAR(100) NULL DEFAULT NULL,
+  `partners_PartnerLevel` VARCHAR(45) NULL DEFAULT NULL,
+  `partners_DateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`partners_AccountCode`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`customers` (
+  `customers_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `customers_AccountCode` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_AccountName` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_Address1` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_Address2` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_City` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_County` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_Postcode` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_AccountManager` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_AccountManagerContact` VARCHAR(45) NULL DEFAULT NULL,
+  `customers_Notes` TEXT(500) NULL DEFAULT NULL,
+  `customers_DateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `partners_partners_AccountCode` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`customers_ID`, `partners_partners_AccountCode`),
+  INDEX `fk_customers_partners_idx` (`partners_partners_AccountCode` ASC),
+  CONSTRAINT `fk_customers_partners`
+    FOREIGN KEY (`partners_partners_AccountCode`)
+    REFERENCES `wifi-1`.`partners` (`partners_AccountCode`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`admin_accounts` (
+  `admin_accounts_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `admin_accounts_Name` VARCHAR(45) NULL DEFAULT NULL,
+  `admin_accounts_Username` VARCHAR(45) NULL DEFAULT NULL,
+  `admin_accounts_Password` VARCHAR(45) NULL DEFAULT NULL,
+  `admin_accounts_Privilege` VARCHAR(1) NULL DEFAULT NULL,
+  PRIMARY KEY (`admin_accounts_ID`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`users` (
+  `users_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `users_FirstName` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Surname` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Type` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Privilege` VARCHAR(1) NULL DEFAULT NULL,
+  `users_Enabled` VARCHAR(1) NULL DEFAULT NULL COMMENT 'Possible Values:\nY = Enabled\nN = Disabled',
+  `users_Email` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Phone` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Username` VARCHAR(45) NULL DEFAULT NULL,
+  `users_Password` VARCHAR(45) NULL DEFAULT NULL,
+  `users_DateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `customers_customers_ID` INT(11) NOT NULL,
+  `customers_partners_partners_AccountCode` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`users_ID`, `customers_customers_ID`, `customers_partners_partners_AccountCode`),
+  INDEX `fk_users_customers1_idx` (`customers_customers_ID` ASC, `customers_partners_partners_AccountCode` ASC),
+  CONSTRAINT `fk_users_customers1`
+    FOREIGN KEY (`customers_customers_ID` , `customers_partners_partners_AccountCode`)
+    REFERENCES `wifi-1`.`customers` (`customers_ID` , `partners_partners_AccountCode`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`site` (
+  `site_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `site_SiteName` VARCHAR(45) NULL DEFAULT NULL,
+  `site_Address1` VARCHAR(45) NULL DEFAULT NULL,
+  `site_Address2` VARCHAR(45) NULL DEFAULT NULL,
+  `site_City` VARCHAR(45) NULL DEFAULT NULL,
+  `site_County` VARCHAR(45) NULL DEFAULT NULL,
+  `site_Postcode` VARCHAR(45) NULL DEFAULT NULL,
+  `site_Opening Hours` VARCHAR(45) NULL DEFAULT NULL,
+  `site_SiteContactName` VARCHAR(45) NULL DEFAULT NULL,
+  `site_SiteContactEmail` VARCHAR(45) NULL DEFAULT NULL,
+  `site_SiteContactPhone` VARCHAR(45) NULL DEFAULT NULL,
+  `site_SLA` VARCHAR(45) NULL DEFAULT NULL,
+  `site_Active` VARCHAR(1) NULL DEFAULT NULL COMMENT 'Possible Values:\nY = Active\nN = Inactive',
+  `site_DateCreated` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `customers_customers_ID` INT(11) NOT NULL,
+  `customers_partners_partners_AccountCode` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`site_ID`, `customers_customers_ID`, `customers_partners_partners_AccountCode`),
+  INDEX `fk_site_customers1_idx` (`customers_customers_ID` ASC, `customers_partners_partners_AccountCode` ASC),
+  CONSTRAINT `fk_site_customers1`
+    FOREIGN KEY (`customers_customers_ID` , `customers_partners_partners_AccountCode`)
+    REFERENCES `wifi-1`.`customers` (`customers_ID` , `partners_partners_AccountCode`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`assets` (
+  `assets_CTE` VARCHAR(6) NOT NULL,
+  `assets_Vendor` VARCHAR(45) NULL DEFAULT NULL,
+  `assets_Model` VARCHAR(45) NULL DEFAULT NULL,
+  `assets_Serial` VARCHAR(45) NULL DEFAULT NULL,
+  `assets_SLA` VARCHAR(45) NULL DEFAULT NULL,
+  `site_site_ID` INT(11) NOT NULL,
+  `site_customers_customers_ID` INT(11) NOT NULL,
+  `site_customers_partners_partners_AccountCode` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`assets_CTE`, `site_site_ID`, `site_customers_customers_ID`, `site_customers_partners_partners_AccountCode`),
+  INDEX `fk_assets_site1_idx` (`site_site_ID` ASC, `site_customers_customers_ID` ASC, `site_customers_partners_partners_AccountCode` ASC),
+  CONSTRAINT `fk_assets_site1`
+    FOREIGN KEY (`site_site_ID` , `site_customers_customers_ID` , `site_customers_partners_partners_AccountCode`)
+    REFERENCES `wifi-1`.`site` (`site_ID` , `customers_customers_ID` , `customers_partners_partners_AccountCode`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`admin_log` (
+  `admin_log_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `admin_log_Timestamp` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `admin_log_Detail` VARCHAR(300) NULL DEFAULT NULL,
+  `admin_accounts_admin_accounts_ID` INT(11) NOT NULL,
+  PRIMARY KEY (`admin_log_ID`, `admin_accounts_admin_accounts_ID`),
+  INDEX `fk_admin_log_admin_accounts1_idx` (`admin_accounts_admin_accounts_ID` ASC),
+  CONSTRAINT `fk_admin_log_admin_accounts1`
+    FOREIGN KEY (`admin_accounts_admin_accounts_ID`)
+    REFERENCES `wifi-1`.`admin_accounts` (`admin_accounts_ID`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+CREATE TABLE IF NOT EXISTS `wifi-1`.`user_log` (
+  `user_log_ID` INT(11) NOT NULL AUTO_INCREMENT,
+  `user_log_Timestamp` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_log_Detail` VARCHAR(300) NULL DEFAULT NULL,
+  `users_users_ID` INT(11) NOT NULL,
+  `users_customers_customers_ID` INT(11) NOT NULL,
+  `users_customers_partners_partners_AccountCode` VARCHAR(6) NOT NULL,
+  PRIMARY KEY (`user_log_ID`, `users_users_ID`, `users_customers_customers_ID`, `users_customers_partners_partners_AccountCode`),
+  INDEX `fk_user_log_users1_idx` (`users_users_ID` ASC, `users_customers_customers_ID` ASC, `users_customers_partners_partners_AccountCode` ASC),
+  CONSTRAINT `fk_user_log_users1`
+    FOREIGN KEY (`users_users_ID` , `users_customers_customers_ID` , `users_customers_partners_partners_AccountCode`)
+    REFERENCES `wifi-1`.`users` (`users_ID` , `customers_customers_ID` , `customers_partners_partners_AccountCode`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
